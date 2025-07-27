@@ -1,0 +1,31 @@
+<program>           ::= <incant_decl>
+
+<incant_decl>       ::= "incant" <identifier> ";" "given" <param_list> ":" <statement_block>
+
+<param_list>        ::= <param>
+                     | <param_list> "," <param>
+
+<param>             ::= <identifier> ":" <type>
+
+<statement_block>   ::= INDENT <statement_list> DEDENT
+
+<statement_list>    ::= <statement>
+                     | <statement_list> <statement>
+
+<statement>         ::= <invoke_statement>
+                     | <bind_statement>
+                     | <yield_statement>
+
+<invoke_statement>  ::= "invoke" "essence:" <identifier> "as" <identifier>
+
+<bind_statement>    ::= "bind" <identifier> "to" <identifier>
+
+<yield_statement>   ::= "yield" <yield_return>
+
+<yield_return>      ::= <property_access>
+                     | <identifier>
+
+<property_access>   ::= <identifier> "of" <identifier>
+
+<type>              ::= <identifier>
+<identifier>        ::= ID
