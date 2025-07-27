@@ -35,11 +35,11 @@ This repository is both a development environment and a living artifact.
 ## ⚙️ Toolchain Goals
 
 Sigil is being built with a classical compiler pipeline in mind:
-	•	Flex + Bison: Lexing and parsing
-	•	AST + Type System: Internally enforced and readable
-	•	Optional LLVM backend: Experimental compiled output
-	•	REPL: For interactive prototyping
-	•	Executable Output: Compiled .sigil files produce terminal output describing their magical effects
+- Flex + Bison: Lexing and parsing
+- AST + Type System: Internally enforced and readable
+- Optional LLVM backend: Experimental compiled output
+- REPL: For interactive prototyping
+- Executable Output: Compiled .sigil files produce terminal output describing their magical effects
 
 ---
 
@@ -48,7 +48,7 @@ Sigil is being built with a classical compiler pipeline in mind:
 When you compile and execute a Sigil script, it prints an in-universe effect report:
 
 ```text
-[LEY EXECUTION REPORT]
+[SIGIL EXECUTION REPORT]
 ──────────────────────────────
 🪄 Invocation: ignite
 
@@ -71,17 +71,22 @@ Expected Outcome:
 This project welcomes developers, storytellers, systems designers, and magic system nerds.
 
 Things to help with:
-	•	Extending the BNF grammar
-	•	Refining type system rules
-	•	Building out the REPL and CLI tooling
-	•	Writing example spells with real output
-	•	Packaging everything so fans can install sigil locally and play
+- Extending the BNF grammar
+- Refining type system rules
+- Building out the REPL and CLI tooling
+- Writing example spells with real output
+- Packaging everything so fans can install sigil locally and play
 
 ---
 
-📜 License
+## 📜 License
 
-TBD — this language is part of a broader narrative fiction project. Use with respect.
+Sigil is dual-licensed:
+
+- All compiler code and technical tooling is released under the [MIT License](LICENSES/MIT.txt).
+- All narrative, grammar, symbolic, and lore-based content is protected under a [Custom License](LICENSES/SIGIL-CUSTOM.txt).
+
+If you wish to build on Sigil’s fictional components, please contact the author for permission.
 
 ---
 
