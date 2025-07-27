@@ -43,26 +43,46 @@ Sigil is being built with a classical compiler pipeline in mind:
 
 ---
 
+Sample Script
+
+In-universe, Sigil scripts are performed by the wielders of magic. In a way, the wielders are the JIT compilers. Scripts written in Sigil are similar to:
+
+```sigil
+incant light; given target:Surface:
+  invoke essence:Light as charm
+  bind charm to target
+  yield lumen of target
+```
+
+Executing such scripts in our world is simpler:
+
+```bash
+$ sigil run light.sigil --target=stone_tablet
+```
+
 🧪 Sample Output
 
-When you compile and execute a Sigil script, it prints an in-universe effect report:
+When you compile and execute such a Sigil script, it prints an in-universe effect report:
 
 ```text
 [SIGIL EXECUTION REPORT]
 ──────────────────────────────
-🪄 Invocation: ignite
+🪄 Invocation: light
 
-Essence Used:       Fire
-Bound Parameters:   intensity = 5
-Supplied at Runtime: target = dry_brush
+Essence Used:       Light
+Alias Form:         charm
+Target Bound:       stone_tablet (Surface)
 
-Decorative Effects:
-- Residue: heat (3s linger)
+Returned:
+- Property: lumen of stone_tablet
+- Type: Lumen
+- Value Projection: visible light field (faint, white-yellow, diffuse)
 
-Expected Outcome:
-- Target ignites within 1.5s
-- Sustained flame for ~18s
-- Risk to nearby flammables within 1m radius
+Runtime Manifestation:
+- Projected into wielder’s immediate surroundings
+- Will fade within 6–8 seconds unless captured or redirected
+- May be referenced in follow-up incantations
+
 ──────────────────────────────
 ```
 
