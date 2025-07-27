@@ -1,0 +1,26 @@
+Sigil Programming Language
+--------------------------
+
+Copyright (c) 2025 John Batte
+All rights reserved.
+
+This repository contains two distinct licensing scopes:
+
+1. Compiler Tooling and Runtime Code:
+   Licensed under the MIT License. See LICENSES/MIT.txt for details.
+
+2. Language Design, Examples, and Narrative Content:
+   Protected under the Sigil Custom License. See LICENSES/SIGIL-CUSTOM.txt.
+
+The Sigil Custom License restricts the use of symbolic syntax, execution metaphors,
+narrative descriptors, and example spells from being reused in derivative creative works
+without written permission.
+
+No part of this language’s fictional framework may be rebranded, commercialized, or
+included in other story-based projects (e.g., novels, games, visual media) without
+explicit licensing from the original author.
+
+For inquiries, email: jbatte+sigil_inquiries@gmail.com
+
+This NOTICE file is provided for informational purposes and does not modify the terms of
+any applicable license.

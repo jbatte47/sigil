@@ -1,0 +1,37 @@
+Sigil Custom License (Narrative and Design Protection)
+
+The Sigil programming language, its symbolic systems, lore-bound syntax, 
+example spells, narrative output formats, and all fictional or metaphysical 
+elements present in this repository are protected by the following terms:
+
+1. Ownership & Control
+   All non-code content in this repository (including but not limited to: 
+   `.sigil` example files, README text, story-based descriptions, world design, 
+   language grammar structure, and narrative-based execution output) is the 
+   intellectual property of John Batte and may not be used in derivative 
+   creative works without express written permission.
+
+2. Allowed Usage
+   - You may read, study, and experiment with the Sigil language locally.
+   - You may contribute to this repository under the Contributor License Agreement.
+   - You may build tooling that interacts with the Sigil compiler or grammar, 
+     provided such tooling does not replicate or reinterpret Sigil’s fictional 
+     language as part of a separate creative or narrative work.
+
+3. Prohibited Use
+   - You may not use Sigil’s syntax, structure, concepts, or example spells 
+     in books, games, comics, ARGs, or other fictional works without explicit 
+     written permission.
+   - You may not represent the Sigil language or universe as your own creation.
+   - You may not commercialize derived content that uses or implies canonical 
+     Sigil structure.
+
+4. Exceptions
+   Exceptions may be granted for educational, scholarly, or research use. 
+   Please contact the author to request permission.
+
+5. Enforcement
+   Unauthorized use of Sigil’s fictional elements constitutes copyright 
+   infringement and will be pursued under applicable intellectual property law.
+
+This license applies to all content in this repository *not explicitly covered by the MIT License*.
