@@ -1,0 +1,57 @@
+# built-ins (no need to import): Type, World, Container, Func, Factor, Vector, Distance, User, Essence, Trigger, Action, Hand, Finger
+import Combustible, Sophont, Enemy, Staff from core;
+
+###
+## DEFINITIONS FOR THIS SCRIPT
+# built-in constants:
+# - MAX_DISTANCE: maxiumum allowable distance for a given effect. This is a static (arbitrary) value set by the compiler (different compiler builds may use different values).
+# - MAX_FACTOR: 100
+# - MIN_FACTOR: 0
+# built-in types/funcs:
+# - Type: built-in struct; extended by core interfaces e.g. Combustible, Enemy, Staff, Container
+# - World: built-in static class; exposes world functions:
+#   - ping: ray cast from point of origin; return set of hit elements. optional arg: `radius` (default: `MAX_DISTANCE`)
+#   - sphere: create spherical essence container (type:Container); return container instance. required arg: `radius`
+# - Func: built-in static class; exposes meta / informational functions:
+#   - filter: takes a set and returns a filtered set; at least one arg required: `type` (enacts type filtration); `eval` (provides custom eval function); [NOTE]: this arg set will expand as needed
+#   - first: takes a set and returns the first item, if it exists
+#   - trigger_intensity: takes a Trigger and returns a Factor; required arg: `trigger` (`Trigger`)
+# - Factor: integer value, clamped by compiler from 0-100. treated as a "percentage" value.
+# - Essence: built-in static class; exposes essence ctors:
+#   - heat: thermal energy; required arg: `intensity` (`Factor`). 0 = no effect; 100 = stellar core temp
+#   - force: kinetic / inertial energy; required arg: `intensity` (`Factor`). 0 = no force; 100 = inertia equivalent to planetary mass
+# - Vector: built-in static class; exposes Vector ctors:
+#   - straight: direct-line vector; combines target with force; required args: `target` (any instance); `force` (Essence.force)
+# - Trigger: built-in static class; exposes Trigger ctors:
+#   - gesture: defines a gestural trigger; required arg: `action` (`Action`)
+# - Action: built-in static class; exposes Action ctors; instances can be composed via combinatorial operators Plus (+) and Minus (-):
+#   - long_press: defines a longer press by a digit (finger); required args: `hand` (`Hand` enum: Left, Right), `finger` (`Finger` enum: Thumb, Second, Third, Fourth, Fifth)
+#   - sweep: defines a sweeping motion, typically while holding the object to be triggered
+# - User: built-in static class; exposes user functions:
+#   - skill_level: returns a `Factor` indicating magical mastery. 0 = novice; 100 = god
+##
+
+# Define Rituals
+incant target_enemy(type:Type, radius:Distance):
+  let target = (World.ping(radius=radius) -> Func.filter(type=type) -> Func.first)
+  yield target
+
+# fireball: up to 2m wide, scaled with intensity
+incant fireball(target:Combustible, intensity:Factor):
+  let fireball = (Essence.heat(intensity=intensity) -> World.sphere(radius=(2 * (intensity / 100))))
+  Essence.force(intensity=(intensity / 2)) -> Vector.straight(target=target) -> fireball
+
+# Define Instances
+instance ash_staff:Staff;
+
+imbue into ash_staff:
+  let intensity = (Trigger.gesture(action=(Action.long_press(hand=Right, finger=Thumb) + Action.sweep)) -> Func.trigger_intensity)
+  let find_target = target_enemy(radius=(intensity * User.skill_level))
+  let cast_fireball = fireball(intensity=intensity)
+  find_target(type=Combustible) -> cast_fireball
+
+# Invocation
+instance goblin:Enemy(distance=15).with_clothing('rags') # makes goblin Combustible
+instance troll:Enemy(distance=5)
+given User.simulate(skill_level=MAX_FACTOR):
+  gesture(intensity=MAX_FACTOR) with ash_staff(Action.long_press(hand=Right, finger=Thumb) + Action.sweep);

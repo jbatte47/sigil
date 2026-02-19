@@ -1,31 +1,104 @@
-<program>           ::= <incant_decl>
+<program>           ::= <declaration_list>
 
-<incant_decl>       ::= "incant" <identifier> ";" "given" <param_list> ":" <statement_block>
+<declaration_list>    ::= <declaration>
+                     | <declaration_list> <declaration>
+
+<declaration>         ::= <import_decl>
+                     | <export_decl>
+                     | <instance_decl>
+                     | <incant_decl>
+                     | <manifest_decl>
+                     | <imbue_decl>
+                     | <invoke_stat>
+                     | <simulation_block>
+
+<import_decl>       ::= "import" <identifier_list> "from" <identifier> ";"
+
+<export_decl>       ::= "export" <declaration>
+
+<instance_decl>     ::= "instance" <identifier> ":" <type> <opt_init> ";"
+
+<opt_init>          ::= "(" <call_arg_list> ")"
+                     | /* empty */
+
+<incant_decl>       ::= "incant" <identifier> <opt_params> ":" <statement_block>
+
+<opt_params>        ::= "(" <param_list> ")"
+                     | /* empty */
+
+<manifest_decl>      ::= "manifest" <identifier> "as" <identifier> ";"
+
+<imbue_decl>         ::= "imbue" "into" <identifier> ":" <imbue_content>
+
+<imbue_content>      ::= INDENT <statement_list> DEDENT
+                     | NEWLINE INDENT <statement_list> DEDENT
+
+<statement_block>   ::= INDENT <statement_list> DEDENT
+                     | NEWLINE INDENT <statement_list> DEDENT
+                     | <statement_list>
+
+<statement_list>    ::= <statement>
+                     | <statement_list> <statement>
+
+<statement>         ::= "let" <identifier> "=" <expression>
+                     | <expression>
+                     | "yield" <expression>
+                     | <gesture_stmt>
+                     | NEWLINE
+                     | ";"
+
+<expression>        ::= <flow_expr>
+
+<flow_expr>         ::= <binary_expr>
+                     | <flow_expr> "->" <binary_expr>
+
+<binary_expr>       ::= <term>
+                     | <binary_expr> "+" <term>
+                     | <binary_expr> "-" <term>
+
+<term>              ::= <factor>
+                     | <term> "*" <factor>
+                     | <term> "/" <factor>
+
+<factor>            ::= <primary_expr>
+                     | "(" <expression> ")"
+
+<primary_expr>      ::= <call_expr>
+                     | "essence:" <identifier> <opt_call_args>
+                     | "trigger:" <identifier> <opt_call_args>
+                     | <member_access>
+                     | <identifier>
+                     | NUMBER
+
+<call_expr>         ::= <identifier> <opt_call_args>
+
+<opt_call_args>     ::= "(" <call_arg_list> ")"
+                     | /* empty */
+
+<call_arg_list>     ::= <call_arg>
+                     | <call_arg_list> "," <call_arg>
+                     | <call_arg_list> "+" <call_arg>
+                     | /* empty */
+
+<call_arg>          ::= <identifier> "=" <expression>
+                     | <expression>
+
+<member_access>     ::= <identifier> "." <identifier>
+                     | <member_access> "." <identifier>
+
+<simulation_block>  ::= "given" <expression> ":" <statement_block>
+
+<gesture_stmt>      ::= "gesture" "with" <identifier> <opt_call_args> ";"
+
+<invoke_stat>        ::= "invoke" <identifier> ";"
 
 <param_list>        ::= <param>
                      | <param_list> "," <param>
 
 <param>             ::= <identifier> ":" <type>
 
-<statement_block>   ::= INDENT <statement_list> DEDENT
-
-<statement_list>    ::= <statement>
-                     | <statement_list> <statement>
-
-<statement>         ::= <invoke_statement>
-                     | <bind_statement>
-                     | <yield_statement>
-
-<invoke_statement>  ::= "invoke" "essence:" <identifier> "as" <identifier>
-
-<bind_statement>    ::= "bind" <identifier> "to" <identifier>
-
-<yield_statement>   ::= "yield" <yield_return>
-
-<yield_return>      ::= <property_access>
-                     | <identifier>
-
-<property_access>   ::= <identifier> "of" <identifier>
+<identifier_list>    ::= <identifier>
+                     | <identifier_list> "," <identifier>
 
 <type>              ::= <identifier>
 <identifier>        ::= ID

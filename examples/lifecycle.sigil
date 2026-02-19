@@ -1,0 +1,11 @@
+incant ignite; given target:Combustible:
+  essence:Heat -> target.reaction
+  yield target.temperature
+
+manifest ignite as sparks_pattern;
+
+imbue sparks_pattern into ash_staff:
+  on trigger:Gesture(sweep, long_press)
+  essence:Light -> ash_staff.glow
+
+invoke ash_staff;

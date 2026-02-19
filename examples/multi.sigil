@@ -1,0 +1,5 @@
+incant ignite; given target:Combustible:
+  essence:Heat -> target.reaction
+
+incant light; given target:Surface:
+  essence:Light -> target.lumen

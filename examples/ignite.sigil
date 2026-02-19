@@ -1,0 +1,3 @@
+incant ignite; given target:Combustible:
+  essence:Heat -> target.reaction
+  yield target.temperature
