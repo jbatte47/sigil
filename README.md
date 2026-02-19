@@ -1,115 +1,101 @@
 # 🪄 Sigil
 
-**Sigil** is a fictional programming language embedded within a narrative universe—but also a real-world, Turing-complete language with working tooling, readable syntax, and a ritual-based programming model.
+**Sigil** is a fictional programming language embedded within a narrative universe—but also a real-world, executable DSL with a ritual-based programming model and a diegetic narrative engine.
 
-In the world of the story, Sigil scripts alter physical reality through performed incantations. In this repo, we aim to make that system technically coherent and executable—bridging narrative design, compiler theory, and symbolic systems.
-
-This repository is both a development environment and a living artifact.
+In the world of the story, Sigil scripts alter physical reality through performed incantations. This toolchain makes that system technically coherent and executable—bridging narrative design, compiler theory, and atmospheric world-building.
 
 ---
 
 ## 🧠 Core Concepts
 
-- **Intent-as-Code**: Sigil is declarative, readable, and performable. A novice can understand the text; only a master can execute it effectively.
-- **Strongly Typed**: All types are explicit. Type declarations may include constructors (`ctor`) to define instance behavior.
-- **Decorators Are Types**: Decorators are implemented as special types marked with `@decorator`, and define `on_call` and/or `on_ctor` methods.
-- **Partial Invocation & Vessels**: Any function may be partially compiled into a vessel (animate or inanimate), which can later be activated with the remaining arguments.
-- **Output-Driven Runtime**: All compilation and REPL activity emits detailed, in-universe magical descriptions to `STDOUT`.
+- **Expression-First**: Sigil is a functional DSL. Every operation—arithmetic, ritual calls, and essence invocations—is an expression.
+- **Hierarchical Namespaces**: Core reality-shards are accessed via dot-notation (e.g., `Essence.heat`, `Action.long_press`, `World.ping`).
+- **Implicit Currying**: All rituals and built-in functions support partial application. Calling a function with subset arguments returns a curried function for later use.
+- **Instance Decoration**: Objects can be embellished with properties that semantically alter their reality at compile-time (e.g., `instance goblin:Enemy().with_clothing('rags')`).
+- **Diegetic Runtime**: Instead of technical logs, the toolchain emits atmospheric, MUD-style narrative descriptions to `STDOUT`.
 
 ---
 
-## 📦 Project Structure
+## ⚙️ The Toolchain
+
+Sigil uses a classical compiler pipeline tailored for narrative output:
+- **Lexer/Parser**: Flex + Bison (Handling indentation, hierarchical namespaces, and recursive expressions).
+- **Semantic Validator**: Enforces "Reality Interfaces" (e.g., `Combustible`, `Staff`) and tracks port compatibility.
+- **Narrative Engine**: Translates AST nodes into diegetic prose via a spatial lexicon.
+
+### Building
+```bash
+cd compiler
+make
+```
+
+### Running
+```bash
+./sigil_compiler ../examples/fireball_staff.sigil
+```
+
+---
+
+## 📜 Example Ritual: `fireball_staff.sigil`
+
+```sigil
+import Combustible, Sophont, Enemy, Staff from core;
+
+# 1. Expressive Rituals
+incant fireball(target:Combustible, intensity:Factor):
+  let fireball = (Essence.heat(intensity=intensity) -> World.sphere(radius=(2 * (intensity / 100))))
+  Essence.force(intensity=(intensity / 2)) -> Vector.straight(target=target) -> fireball
+
+# 2. Decorated Instances
+instance ash_staff:Staff;
+instance goblin:Enemy().with_clothing('rags');
+
+# 3. Enchantment with Currying
+imbue into ash_staff:
+  let intensity = (Trigger.gesture(action=(Action.long_press(hand=Right, finger=Thumb) + Action.sweep)) -> Func.trigger_intensity)
+  find_target(type=Combustible) -> fireball(intensity=intensity)
+```
+
+---
+
+## 🎭 Diegetic Output
+
+When executed, Sigil produces a "Reality Manifest":
+
+```text
+--- AREA DESCRIPTION ---
+The chamber is silent, smelled of ozone and ancient wood.
+
+Resting here is ash_staff, an expertly carved focal point.
+Resting here is goblin, a looming threat, clad in rags.
+
+You begin to weave patterns into the ash_staff, binding its form to your will.
+A faint glow emerges as shimmering waves of intense heat begins to flow...
+
+You perform a focused gesture with the ash_staff.
+A searing bolt of arcane energy erupts from the staff's tip!
+The goblins are caught in the shimmering heat and sent tumbling backward by the crushing wall of kinetic pressure.
+--- END OF LOG ---
+```
+
+---
+
+## 🧬 Project Structure
 
 ```plaintext
 .
-├── grammar/               # BNF definitions for parsing Sigil
-├── compiler/              # Core parser/compiler implementation
-├── runtime/               # REPL, evaluator, execution reporting
-├── examples/              # Sample Sigil programs and vessels
-├── tests/                 # Integration tests for spell behavior
+├── grammar/               # BNF definitions and language design
+├── compiler/              # Flex, Bison, and C implementation
+├── examples/              # Sample "Gold Standard" rituals
 └── README.md
 ```
-
----
-
-## ⚙️ Toolchain Goals
-
-Sigil is being built with a classical compiler pipeline in mind:
-- Flex + Bison: Lexing and parsing
-- AST + Type System: Internally enforced and readable
-- Optional LLVM backend: Experimental compiled output
-- REPL: For interactive prototyping
-- Executable Output: Compiled .sigil files produce terminal output describing their magical effects
-
----
-
-Sample Script
-
-In-universe, Sigil scripts are performed by the wielders of magic. In a way, the wielders are the JIT compilers. Scripts written in Sigil are similar to:
-
-```sigil
-incant light; given target:Surface:
-  invoke essence:Light as charm
-  bind charm to target
-  yield lumen of target
-```
-
-Executing such scripts in our world is simpler:
-
-```bash
-$ sigil run light.sigil --target=stone_tablet
-```
-
-🧪 Sample Output
-
-When you compile and execute such a Sigil script, it prints an in-universe effect report:
-
-```text
-[SIGIL EXECUTION REPORT]
-──────────────────────────────
-🪄 Invocation: light
-
-Essence Used:       Light
-Alias Form:         charm
-Target Bound:       stone_tablet (Surface)
-
-Returned:
-- Property: lumen of stone_tablet
-- Type: Lumen
-- Value Projection: visible light field (faint, white-yellow, diffuse)
-
-Runtime Manifestation:
-- Projected into wielder’s immediate surroundings
-- Will fade within 6–8 seconds unless captured or redirected
-- May be referenced in follow-up incantations
-
-──────────────────────────────
-```
-
-🧬 Contributing
-
-This project welcomes developers, storytellers, systems designers, and magic system nerds.
-
-Things to help with:
-- Extending the BNF grammar
-- Refining type system rules
-- Building out the REPL and CLI tooling
-- Writing example spells with real output
-- Packaging everything so fans can install sigil locally and play
 
 ---
 
 ## 📜 License
 
 Sigil is dual-licensed:
+- **Technical Tooling**: MIT License.
+- **Narrative & Lore**: Protected under a Custom License.
 
-- All compiler code and technical tooling is released under the [MIT License](LICENSES/MIT.txt).
-- All narrative, grammar, symbolic, and lore-based content is protected under a [Custom License](LICENSES/SIGIL-CUSTOM.txt).
-
-If you wish to build on Sigil’s fictional components, please contact the author for permission.
-
----
-
-🌌 Credits
-
-Created by @jbatte47. Conceptualized as a bridge between ritual expression, programming language theory, and narrative design. Sigil is a language both fictional and real.
+🌌 Created by @jbatte47. A bridge between ritual expression and programming language theory.
