@@ -1,3 +1,14 @@
-incant ignite; given target:Combustible:
-essence:Heat -> target.reaction
-yield target.temperature
+import Combustible, Enemy, Staff from core;
+
+incant ignite(target:Combustible):
+  Essence.heat(intensity=100) -> target
+
+instance ash_staff:Staff;
+instance dummy:Enemy(distance=1).with_clothing('rags')
+
+imbue into ash_staff:
+  let target = (World.ping(radius=2) -> Func.filter(type=Combustible) -> Func.first)
+  Trigger.gesture(action=Action.sweep) -> ignite(target=target)
+
+given User.simulate(skill_level=MAX_FACTOR):
+  gesture(intensity=MAX_FACTOR) with ash_staff(Action.sweep);

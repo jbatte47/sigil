@@ -11,12 +11,16 @@ incant fireball(target:Combustible, intensity:Factor):
 instance ash_staff:Staff;
 
 imbue into ash_staff:
-  let intensity = (Trigger.gesture(action=(Action.long_press(hand=Right, finger=Thumb) + Action.sweep)) -> Func.trigger_intensity)
-  let find_target = target_enemy(radius=(intensity * User.skill_level))
+  let intensity = (Trigger.gesture(action=Action.sweep) -> Func.trigger_intensity)
+  # Low skill level results in significant focus degradation.
+  let find_target = target_enemy(radius=(User.skill_level / 2))
   let cast_fireball = fireball(intensity=intensity)
   find_target(type=Combustible) -> cast_fireball
 
 instance goblin:Enemy(distance=15).with_clothing('rags')
-instance troll:Enemy(distance=5)
-given User.simulate(skill_level=MAX_FACTOR):
-  gesture(intensity=MAX_FACTOR) with ash_staff(Action.long_press(hand=Right, finger=Thumb) + Action.sweep);
+
+# Low skill level: 25. 
+# Effective focus radius = 25 / 2 = 12.5U.
+# Goblin at 15U should be out of range.
+given User.simulate(skill_level=25):
+  gesture(intensity=MAX_FACTOR) with ash_staff(Action.sweep);

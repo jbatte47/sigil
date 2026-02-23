@@ -1,5 +1,18 @@
-incant ignite; given target:Combustible:
-  essence:Heat -> target.reaction
+import Combustible, Enemy, Staff from core;
 
-incant light; given target:Surface:
-  essence:Light -> target.lumen
+incant fireball(target:Combustible):
+  Essence.heat(intensity=100) -> target
+
+incant knockback(target:Enemy):
+  Essence.force(intensity=50) -> target
+
+instance ash_staff:Staff;
+instance goblin:Enemy(distance=5).with_clothing('rags')
+
+imbue into ash_staff:
+  let target = (World.ping(radius=10) -> Func.first)
+  Trigger.gesture(action=Action.sweep) -> fireball(target=target)
+  Trigger.gesture(action=Action.long_press(hand=Right, finger=Thumb)) -> knockback(target=target)
+
+given User.simulate(skill_level=MAX_FACTOR):
+  gesture(intensity=MAX_FACTOR) with ash_staff(Action.sweep);
