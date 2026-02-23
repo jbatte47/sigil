@@ -50,21 +50,20 @@ int top_indent() {
         pop_indent();
         return DEDENT;
     }
-    yyterminate();
+    static int once = 0;
+    if (once) yyterminate();
+    once = 1;
+    return END_OF_FILE;
 }
 
 "incant"            { return INCANT; }
-"manifest"          { return MANIFEST; }
 "imbue"             { return IMBUE; }
 "into"              { return INTO; }
-"on"                { return ON; }
 "given"             { return GIVEN; }
 "yield"             { return YIELD; }
-"as"                { return AS; }
 "invoke"            { return INVOKE; }
 "import"            { return IMPORT; }
 "export"            { return EXPORT; }
-"instance"          { return INSTANCE; }
 "from"              { return FROM; }
 "let"               { return LET; }
 "with"              { return WITH; }
