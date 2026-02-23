@@ -8,7 +8,7 @@ incant fireball(target:Combustible, intensity:Factor):
   let fireball = (Essence.heat(intensity=intensity) -> World.sphere(radius=(2 * (intensity / 100))))
   Essence.force(intensity=(intensity / 2)) -> Vector.straight(target=target) -> fireball
 
-instance ash_staff:Staff;
+let ash_staff = Staff;
 
 imbue into ash_staff:
   let intensity = (Trigger.gesture(action=(Action.long_press(hand=Right, finger=Thumb) + Action.sweep)) -> Func.trigger_intensity)
@@ -16,7 +16,7 @@ imbue into ash_staff:
   let cast_fireball = fireball(intensity=intensity)
   find_target(type=Combustible) -> cast_fireball
 
-instance goblin:Enemy(distance=15).with_clothing('rags')
-instance troll:Enemy(distance=5)
+let goblin = Enemy(distance=15).with_clothing('rags')
+let troll = Enemy(distance=5)
 given User.simulate(skill_level=MAX_FACTOR):
   gesture(intensity=MAX_FACTOR) with ash_staff(Action.long_press(hand=Right, finger=Thumb) + Action.sweep);

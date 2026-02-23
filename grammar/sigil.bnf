@@ -5,9 +5,7 @@
 
 <declaration>         ::= <import_decl>
                      | <export_decl>
-                     | <instance_decl>
                      | <incant_decl>
-                     | <manifest_decl>
                      | <imbue_decl>
                      | <invoke_stat>
                      | <simulation_block>
@@ -17,16 +15,9 @@
 
 <export_decl>       ::= "export" <declaration>
 
-<instance_decl>     ::= "instance" <identifier> ":" <identifier> <instance_init> <instance_decorators> ";"
-                     | "instance" <identifier> ":" <identifier> <instance_init> <instance_decorators>
 
-<instance_init>     ::= "(" <call_arg_list> ")"
-                     | /* empty */
 
-<instance_decorators> ::= <instance_decorators> <decorator>
-                        | /* empty */
 
-<decorator>          ::= "." <identifier> "(" <call_arg_list> ")"
 
 <incant_decl>       ::= "incant" <identifier> <opt_params> ":" <statement_block>
 
@@ -34,7 +25,6 @@
                      | "(" ")"
                      | /* empty */
 
-<manifest_decl>      ::= "manifest" <identifier> "as" <identifier> ";"
 
 <imbue_decl>         ::= "imbue" "into" <identifier> ":" <imbue_content>
 

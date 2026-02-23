@@ -16,14 +16,13 @@ ASTNode* root;
 }
 
 %token <str> IDENTIFIER NUMBER STRING
-%token INCANT MANIFEST IMBUE INTO ON GIVEN YIELD AS INVOKE 
-%token IMPORT EXPORT INSTANCE FROM LET WITH GESTURE
+%token INCANT IMBUE INTO GIVEN YIELD INVOKE 
+%token IMPORT EXPORT FROM LET WITH GESTURE
 %token ARROW DOT COLON SEMICOLON COMMA EQUALS PLUS MINUS STAR SLASH
-%token NEWLINE INDENT DEDENT LPAREN RPAREN
+%token NEWLINE INDENT DEDENT LPAREN RPAREN END_OF_FILE
 
-%type <node> program declaration_list declaration import_decl export_decl instance_decl
-%type <node> instance_init instance_decorators decorator
-%type <node> incant_decl opt_params manifest_decl imbue_decl imbue_content 
+%type <node> program declaration_list declaration import_decl export_decl
+%type <node> incant_decl opt_params imbue_decl imbue_content 
 %type <node> statement_block statement_list statement expression
 %type <node> binary_expr term factor
 %type <node> primary_expr call_args call_arg_list call_arg opt_call_args
@@ -37,7 +36,7 @@ ASTNode* root;
 %%
 
 program:
-    declaration_list { root = $1; }
+    declaration_list END_OF_FILE { root = $1; }
     ;
 
 declaration_list:
@@ -55,12 +54,12 @@ declaration_list:
 declaration:
     import_decl { $$ = $1; }
     | export_decl { $$ = $1; }
-    | instance_decl { $$ = $1; }
     | incant_decl { $$ = $1; }
-    | manifest_decl { $$ = $1; }
     | imbue_decl { $$ = $1; }
     | invoke_stat { $$ = $1; }
     | simulation_block { $$ = $1; }
+    | LET IDENTIFIER EQUALS expression { $$ = create_node(NODE_LET, $2, $4, NULL); }
+    | SEMICOLON { $$ = NULL; }
     | NEWLINE { $$ = NULL; }
     ;
 
@@ -76,39 +75,10 @@ export_decl:
     }
     ;
 
-instance_decl:
-    INSTANCE IDENTIFIER COLON IDENTIFIER instance_init instance_decorators SEMICOLON {
-        ASTNode* id = create_node(NODE_IDENTIFIER, $4, NULL, NULL);
-        if ($5) add_next(id, $5);
-        if ($6) add_next(id, $6);
-        $$ = create_node(NODE_INSTANCE, $2, id, NULL);
-    }
-    | INSTANCE IDENTIFIER COLON IDENTIFIER instance_init instance_decorators {
-        ASTNode* id = create_node(NODE_IDENTIFIER, $4, NULL, NULL);
-        if ($5) add_next(id, $5);
-        if ($6) add_next(id, $6);
-        $$ = create_node(NODE_INSTANCE, $2, id, NULL);
-    }
     ;
 
-instance_init:
-    LPAREN call_arg_list RPAREN { $$ = $2; }
-    | /* empty */ { $$ = NULL; }
-    ;
 
-instance_decorators:
-    instance_decorators decorator {
-        if ($1) { add_next($1, $2); $$ = $1; }
-        else $$ = $2;
-    }
-    | /* empty */ { $$ = NULL; }
-    ;
 
-decorator:
-    DOT IDENTIFIER LPAREN call_arg_list RPAREN {
-        $$ = create_node(NODE_CALL, $2, $4, NULL);
-    }
-    ;
 
 incant_decl:
     INCANT IDENTIFIER opt_params COLON statement_block {
@@ -122,10 +92,6 @@ opt_params:
     | /* empty */ { $$ = NULL; }
     ;
 
-manifest_decl:
-    MANIFEST IDENTIFIER AS IDENTIFIER SEMICOLON {
-        $$ = create_node(NODE_MANIFEST, $2, create_node(NODE_IDENTIFIER, $4, NULL, NULL), NULL);
-    }
     ;
 
 imbue_decl:
