@@ -25,18 +25,18 @@ World.sphere(radius=50)
 
 ---
 
-## 2. Alias Strategy: Keyword-Based Forms
+## 2. Removed Aliases: Keyword-Based Forms
 
-Sigil previously supported keyword-based aliases for `Essence` and `Trigger` systems. These are now **deprecated**.
+Sigil previously supported keyword-based aliases for `Essence` and `Trigger` systems. These have been **removed from the grammar**.
 
-### Deprecated Forms
-| Deprecated Syntax | Canonical Equivalent | Status |
+### Removed Forms
+| Removed Syntax | Canonical Equivalent | Status |
 | :--- | :--- | :--- |
-| `essence:heat(...)` | `Essence.heat(...)` | Deprecated |
-| `trigger:gesture(...)` | `Trigger.gesture(...)` | Deprecated (Broken) |
+| `essence:heat(...)` | `Essence.heat(...)` | Removed |
+| `trigger:gesture(...)` | `Trigger.gesture(...)` | Removed |
 
-> [!WARNING]
-> The `trigger:` alias is currently incompatible with `gesture` due to parser collisions. All users must immediately migrate to `Trigger.gesture()`.
+> [!IMPORTANT]
+> All scripts must use the dot-notation. The `essence:` and `trigger:` keywords no longer match any production in the Sigil grammar.
 
 ---
 
@@ -50,10 +50,9 @@ When updating existing `.sigil` scripts or contributing to the core library:
 
 ---
 
-## 4. Compatibility Commitment
+## 4. Stability Commitment
 
-While the parser may continue to accept `essence:` for a limited time to avoid breaking legacy examples, new features and grammar refinements will assume the dot-notation as the source of truth.
+The hierarchical dot-notation is the source of truth for all future grammar and compiler developments.
 
-- **Phase 1**: Update all documentation and examples to use canonical syntax.
-- **Phase 2**: (Future) Issue compiler warnings for deprecated aliases.
-- **Phase 3**: (Future) Remove alias support from the grammar.
+- **Phase 1**: Removed alias support from the grammar and parser.
+- **Phase 2**: Normalizing AST representation to a uniform `NODE_MEMBER_ACCESS` and `NODE_CALL` structure.

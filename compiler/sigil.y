@@ -16,7 +16,7 @@ ASTNode* root;
 }
 
 %token <str> IDENTIFIER NUMBER STRING
-%token INCANT MANIFEST IMBUE INTO ON TRIGGER GIVEN ESSENCE YIELD AS INVOKE 
+%token INCANT MANIFEST IMBUE INTO ON GIVEN YIELD AS INVOKE 
 %token IMPORT EXPORT INSTANCE FROM LET WITH GESTURE
 %token ARROW DOT COLON SEMICOLON COMMA EQUALS PLUS MINUS STAR SLASH
 %token NEWLINE INDENT DEDENT LPAREN RPAREN
@@ -199,8 +199,6 @@ primary_expr:
     | primary_expr call_args { 
         $$ = create_node(NODE_CALL, NULL, $1, $2); 
     }
-    | ESSENCE IDENTIFIER opt_call_args { $$ = create_node(NODE_ESSENCE_INVOCATION, $2, $3, NULL); }
-    | TRIGGER IDENTIFIER opt_call_args { $$ = create_node(NODE_TRIGGER, $2, $3, NULL); }
     ;
 
 opt_call_args:
