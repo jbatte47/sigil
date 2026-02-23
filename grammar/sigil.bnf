@@ -89,7 +89,6 @@
 <call_arg>          ::= <identifier> "=" <expression>
                      | <expression>
 
-<member_access>     ::= <primary_expr> "." <identifier>
 
 <simulation_block>  ::= "given" <expression> ":" <statement_block>
 

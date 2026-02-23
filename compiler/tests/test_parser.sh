@@ -6,6 +6,11 @@ COMPILER="./sigil_compiler"
 TEST_DIR="tests/fragments"
 mkdir -p "$TEST_DIR"
 
+if [ ! -x "$COMPILER" ]; then
+    echo "Error: Compiler not found or not executable. Run 'make' first."
+    exit 1
+fi
+
 passed=0
 failed=0
 
@@ -30,13 +35,13 @@ assert_parse() {
 }
 
 # 1. Basic Declaration
-assert_parse "basic_decl" "instance fireball_staff : weapon;" 0
+assert_parse "basic_decl" "instance fireball_staff:weapon;" 0
 
 # 2. String Literal
 assert_parse "string_literal" "incant test():\n  let msg = \"Hello Sigil\"" 0
 
 # 3. Decorators
-assert_parse "decorators" "instance staff : weapon .fire(level=10);" 0
+assert_parse "decorators" "instance staff:weapon.fire(level=10);" 0
 
 # 4. Named Args (Equals)
 assert_parse "named_args_equals" "incant test():\n  cast(spell=fireball, power=10)" 0

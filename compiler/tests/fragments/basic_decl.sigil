@@ -1,1 +1,1 @@
-instance fireball_staff : weapon;
+instance fireball_staff:weapon;
