@@ -47,7 +47,9 @@ Please read the CLA before submitting your first PR.
 ## 🧪 How to Contribute
 
 1. Fork this repository
-2. Create a new branch: `git checkout -b my-sigil-contribution`
+2. Create a new branch: `git checkout -b <prefix>/<issue-number>-<description>`
+   - **Prefixes**: `feat/` (features), `fix/` (bugs), `docs/` (documentation), `chore/` (maintenance)
+   - **Example**: `feat/1-new-keyword`
 3. Make your changes
 4. Write tests or example output where appropriate
 5. Submit a pull request with a clear description of your changes
