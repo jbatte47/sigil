@@ -1,0 +1,2 @@
+incant test():
+  cast(spell=fireball, power=10)

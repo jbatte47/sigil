@@ -25,10 +25,12 @@ int main(int argc, char **argv) {
     } else {
       printf("\n[SIGIL COMPILER] Ritual failed semantic validation. Reality "
              "instability detected.\n");
+      return 1;
     }
   } else {
     printf(
         "\n[SIGIL COMPILER] Ritual failed due to grammatical instability.\n");
+    return 1;
   }
 
   return 0;

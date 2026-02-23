@@ -87,7 +87,7 @@ int top_indent() {
     return NUMBER; 
 }
 
-'[^']*'|'\"'[^'\"']*'\"' {
+\"[^\"]*\"|'[^']*' {
     yylval.str = strndup(yytext + 1, strlen(yytext) - 2);
     return STRING;
 }
