@@ -118,6 +118,7 @@ incant_decl:
 
 opt_params:
     LPAREN param_list RPAREN { $$ = $2; }
+    | LPAREN RPAREN { $$ = NULL; }
     | /* empty */ { $$ = NULL; }
     ;
 
@@ -224,7 +225,6 @@ call_arg_list:
 
 call_arg:
     IDENTIFIER EQUALS expression { $$ = create_node(NODE_NAMED_ARG, $1, $3, NULL); }
-    | IDENTIFIER COLON expression { $$ = create_node(NODE_NAMED_ARG, $1, $3, NULL); }
     | expression { $$ = $1; }
     ;
 

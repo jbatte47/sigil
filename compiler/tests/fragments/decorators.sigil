@@ -1,0 +1,1 @@
+instance staff : weapon .fire(level=10);

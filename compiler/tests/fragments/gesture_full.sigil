@@ -1,0 +1,2 @@
+given User.simulate():
+  gesture (target=foe) with staff (power=5);
