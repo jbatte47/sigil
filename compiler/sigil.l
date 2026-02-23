@@ -58,10 +58,7 @@ int top_indent() {
 "imbue"             { return IMBUE; }
 "into"              { return INTO; }
 "on"                { return ON; }
-"trigger"           { return TRIGGER; }
 "given"             { return GIVEN; }
-"essence:"|"essense:" { return ESSENCE; }
-"trigger:"          { return TRIGGER; }
 "yield"             { return YIELD; }
 "as"                { return AS; }
 "invoke"            { return INVOKE; }

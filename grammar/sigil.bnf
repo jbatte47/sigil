@@ -64,8 +64,6 @@
                      | "(" <expression> ")"
 
 <primary_expr>      ::= <call_expr>
-                     | "essence:" <identifier> <opt_call_args>
-                     | "trigger:" <identifier> <opt_call_args>
                      | <member_access>
                      | <identifier>
                      | NUMBER
