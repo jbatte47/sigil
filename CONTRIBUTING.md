@@ -18,6 +18,7 @@ This project is built on equal parts compiler theory, narrative design, and meta
 
 **Grammar / Compiler**
 - Help define and refine the `BNF` grammar
+- Adhere to the [Canonical Call Syntax Policy](docs/SYNTAX_POLICY.md)
 - Implement core parsing and evaluation behavior using Flex/Bison
 - Expand the type checker and decorator system
 
