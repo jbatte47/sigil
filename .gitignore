@@ -1,1 +1,28 @@
 sandbox/
+
+# C / native build artifacts
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.exe
+
+# Flex/Bison generated sources
+compiler/lex.yy.c
+compiler/sigil.tab.c
+compiler/sigil.tab.h
+compiler/sigil.output
+
+
+# Local compiler binary + debug symbols
+compiler/sigil_compiler
+compiler/*.dSYM/
+
+# Editor / OS noise
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

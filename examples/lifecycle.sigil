@@ -1,11 +1,13 @@
-incant ignite; given target:Combustible:
-  essence:Heat -> target.reaction
-  yield target.temperature
+import Combustible, Enemy, Staff from core;
 
-manifest ignite as sparks_pattern;
+incant glow(vessel:Staff):
+  Essence.heat(intensity=10) -> vessel
 
-imbue sparks_pattern into ash_staff:
-  on trigger:Gesture(sweep, long_press)
-  essence:Light -> ash_staff.glow
+instance ash_staff:Staff;
 
-invoke ash_staff;
+imbue into ash_staff:
+  let intensity = (Trigger.gesture(action=Action.long_press(hand=Right, finger=Thumb)) -> Func.trigger_intensity)
+  Trigger.gesture(action=Action.long_press(hand=Right, finger=Thumb)) -> glow(vessel=ash_staff)
+
+given User.simulate(skill_level=MAX_FACTOR):
+  gesture(intensity=MAX_FACTOR) with ash_staff(Action.long_press(hand=Right, finger=Thumb));
