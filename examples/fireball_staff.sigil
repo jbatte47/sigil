@@ -1,22 +1,15 @@
-import Combustible, Enemy, Staff from core;
+core manifests [ Factor, Type, Distance, Func, Vector3 ]
+reality manifests [ Combustible, Enemy, WorldObject, Shape ]
+paranormal manifests [ Essence, Psychic ]
 
-incant target_enemy(type:Type, radius:Distance):
-  let target = (World.ping(radius=radius) -> Func.filter(type=type) -> Func.first)
-  yield target
+incant target_enemy [type:Type, radius:Distance]
+  (Psychic.ping (actual radius))
+  | (Func.filter (join type Enemy))
+  | (Func.first)
 
-incant fireball(target:Combustible, intensity:Factor):
-  let fireball = (Essence.heat(intensity=intensity) -> World.sphere(radius=(2 * (intensity / 100))))
-  Essence.force(intensity=(intensity / 2)) -> Vector.straight(target=target) -> fireball
-
-let ash_staff = Staff;
-
-imbue into ash_staff:
-  let intensity = (Trigger.gesture(action=(Action.long_press(hand=Right, finger=Thumb) + Action.sweep)) -> Func.trigger_intensity)
-  let find_target = target_enemy(radius=(intensity * User.skill_level))
-  let cast_fireball = fireball(intensity=intensity)
-  find_target(type=Combustible) -> cast_fireball
-
-let goblin = Enemy(distance=15).with_clothing('rags')
-let troll = Enemy(distance=5)
-given User.simulate(skill_level=MAX_FACTOR):
-  gesture(intensity=MAX_FACTOR) with ash_staff(Action.long_press(hand=Right, finger=Thumb) + Action.sweep);
+incant fireball [target:WorldObject, intensity:Factor]
+  (hold [actual_intensity as (actual intensity)])
+  | (Essence.heat actual_intensity)
+  | (Shape.sphere (/ actual_intensity 2))
+  | (Vector3.straight target)
+  | (Essence.force (* actual_intensity 2))

@@ -39,22 +39,24 @@ make
 ## 📜 Example Ritual: `fireball_staff.sigil`
 
 ```sigil
-import Combustible, Sophont, Enemy, Staff from core;
+core manifests [ Factor, Type, Distance, Func, Vector3 ]
+reality manifests [ Combustible, Enemy, WorldObject, Shape ]
+paranormal manifests [ Essence, Psychic ]
 
-# 1. Expressive Rituals
-incant fireball(target:Combustible, intensity:Factor):
-  let fireball = (Essence.heat(intensity=intensity) -> World.sphere(radius=(2 * (intensity / 100))))
-  Essence.force(intensity=(intensity / 2)) -> Vector.straight(target=target) -> fireball
+incant target_enemy [type:Type, radius:Distance]
+  (Psychic.ping (actual radius))
+  | (Func.filter (join type Enemy))
+  | (Func.first)
 
-# 2. Decorated Instances
-instance ash_staff:Staff;
-instance goblin:Enemy().with_clothing('rags');
-
-# 3. Enchantment with Currying
-imbue into ash_staff:
-  let intensity = (Trigger.gesture(action=(Action.long_press(hand=Right, finger=Thumb) + Action.sweep)) -> Func.trigger_intensity)
-  find_target(type=Combustible) -> fireball(intensity=intensity)
+incant fireball [target:WorldObject, intensity:Factor]
+  (hold [actual_intensity as (actual intensity)])
+  | (Essence.heat actual_intensity)
+  | (Shape.sphere (/ actual_intensity 2))
+  | (Vector3.straight target)
+  | (Essence.force (* actual_intensity 2))
 ```
+
+Canonical v2 examples also live under `examples/v2/`.
 
 ---
 
