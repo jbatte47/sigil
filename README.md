@@ -11,7 +11,7 @@ In the world of the story, Sigil scripts alter physical reality through performe
 - **Expression-First**: Sigil is a functional DSL. Every operation—arithmetic, ritual calls, and essence invocations—is an expression.
 - **Hierarchical Namespaces**: Core reality-shards are accessed via dot-notation (e.g., `Essence.heat`, `Action.long_press`, `World.ping`).
 - **Implicit Currying**: All rituals and built-in functions support partial application. Calling a function with subset arguments returns a curried function for later use.
-- **Instance Decoration**: Objects can be embellished with properties that semantically alter their reality at compile-time (e.g., `instance goblin:Enemy().with_clothing('rags')`).
+- **Instance Decoration**: Type and instance metadata are part of the language roadmap, with v2 documentation and examples converging on declarative forms.
 - **Diegetic Runtime**: Instead of technical logs, the toolchain emits atmospheric, MUD-style narrative descriptions to `STDOUT`.
 
 ---
