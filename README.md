@@ -34,6 +34,17 @@ make
 ./sigil_compiler ../examples/fireball_staff.sigil
 ```
 
+## 📊 Feature Status
+
+| Feature | Status | Notes |
+| --- | --- | --- |
+| `manifests` imports | Implemented | v2 module import syntax is parser-supported. |
+| `incant` with bracket params | Implemented | Function declarations use `incant name [arg:Type]`. |
+| Pipe execution (`|`) | Implemented | Sequential expression composition in v2 examples. |
+| Prefix-call expressions | Implemented | Clojure-style call form is parser-supported. |
+| Legacy v1 syntax (`import ... from`, `imbue into`, `given`) | Deprecated | Maintained only in historical docs/tests. |
+| Type/instance metadata decorations | Planned | Specification finalized; implementation tracked in roadmap docs. |
+
 ---
 
 ## 📜 Example Ritual: `fireball_staff.sigil`
