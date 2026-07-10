@@ -1,6 +1,6 @@
 # 🪄 Sigil
 
-**Sigil** is a fictional programming language embedded within a narrative universe—but also a real-world, executable DSL with a ritual-based programming model and a diegetic narrative engine.
+**Sigil** is a fictional programming language embedded within a narrative universe—but also a real-world, executable DSL with a ritual-based programming model and an evolving runtime.
 
 In the world of the story, Sigil scripts alter physical reality through performed incantations. This toolchain makes that system technically coherent and executable—bridging narrative design, compiler theory, and atmospheric world-building.
 
@@ -10,18 +10,18 @@ In the world of the story, Sigil scripts alter physical reality through performe
 
 - **Expression-First**: Sigil is a functional DSL. Every operation—arithmetic, ritual calls, and essence invocations—is an expression.
 - **Hierarchical Namespaces**: Core reality-shards are accessed via dot-notation (e.g., `Essence.heat`, `Action.long_press`, `World.ping`).
-- **Implicit Currying**: All rituals and built-in functions support partial application. Calling a function with subset arguments returns a curried function for later use.
-- **Instance Decoration**: Type and instance metadata are part of the language roadmap, with v2 documentation and examples converging on declarative forms.
-- **Diegetic Runtime**: Instead of technical logs, the toolchain emits atmospheric, MUD-style narrative descriptions to `STDOUT`.
+- **Prefix-Call Semantics**: Ritual expressions use a Clojure-like prefix-call style in v2 parser forms.
+- **Type & Instance Declarations**: Declarative `type` / `instance` forms (including metadata prefixes) are parser-supported in the current grammar.
+- **Narrative Runtime (In Progress)**: The parser/compiler path is live today; full diegetic narrative execution is being integrated via the Rust CLI runtime.
 
 ---
 
 ## ⚙️ The Toolchain
 
-Sigil uses a classical compiler pipeline tailored for narrative output:
+Sigil currently uses a classical compiler pipeline, with narrative execution being integrated in the Rust CLI layer:
 - **Lexer/Parser**: Flex + Bison (Handling indentation, hierarchical namespaces, and recursive expressions).
-- **Semantic Validator**: Enforces "Reality Interfaces" (e.g., `Combustible`, `Staff`) and tracks port compatibility.
-- **Narrative Engine**: Translates AST nodes into diegetic prose via a spatial lexicon.
+- **Semantic Validation**: Early-stage semantic checks exist; deeper interface/runtime validation is planned.
+- **Runtime Layer**: Rust CLI (`sigil`) handles state loading, enchantment flow, and wield simulation.
 
 ### Building
 ```bash
@@ -42,8 +42,10 @@ make
 | `incant` with bracket params | Implemented | Function declarations use `incant name [arg:Type]`. |
 | Pipe execution (`|`) | Implemented | Sequential expression composition in v2 examples. |
 | Prefix-call expressions | Implemented | Clojure-style call form is parser-supported. |
+| `type` declarations | Implemented | Supports `type Name` and `type Name ^{...}` forms. |
+| `instance` declarations | Implemented | Supports `instance name :Type`, `^{...}`, and `^~{...}` metadata forms. |
 | Legacy v1 syntax (`import ... from`, `imbue into`, `given`) | Deprecated | Maintained only in historical docs/tests. |
-| Type/instance metadata decorations | Planned | Specification finalized; implementation tracked in roadmap docs. |
+| Full diegetic prose runtime in compiler path | In Progress | Current C compiler entrypoint prints AST; narrative execution is currently centered in Rust CLI flow. |
 
 ---
 
@@ -71,9 +73,16 @@ Canonical v2 examples also live under `examples/v2/`.
 
 ---
 
-## 🎭 Diegetic Output
+## 🎭 Runtime Output
 
-When executed, Sigil produces a "Reality Manifest":
+Current state:
+- `compiler/sigil_compiler` parses and prints AST output for valid scripts.
+- `sigil` (Rust CLI) executes stateful enchant/wield flows and emits textual simulation output.
+
+Target state (roadmap):
+- Unified diegetic "Reality Manifest" output across the end-to-end execution path.
+
+Illustrative target output:
 
 ```text
 --- AREA DESCRIPTION ---
