@@ -1,0 +1,10 @@
+core manifests [ Factor, Vector3 ]
+reality manifests [ Shape, WorldObject ]
+paranormal manifests [ Essence ]
+
+incant fireball [target:WorldObject, intensity:Factor]
+  (hold [actual_intensity as (actual intensity)])
+  | (Essence.heat actual_intensity)
+  | (Shape.sphere (/ actual_intensity 2))
+  | (Vector3.straight target)
+  | (Essence.force (* actual_intensity 2))

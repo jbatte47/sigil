@@ -1,0 +1,26 @@
+user:
+  name: Grand Wizard Bob
+  skill_level: 100
+  position:
+  - 0.0
+  - 0.0
+  - 0.0
+env:
+  name: Deadly Jungle
+  atmosphere: humid
+npcs:
+- name: Orc 2
+  type_name: Enemy
+  position:
+  - 15.0
+  - 0.0
+  - 0.0
+inventory:
+- name: Oak Staff
+  type_name: Staff
+  enchantment: examples/v2/fireball.sigil
+  enchanted_name: Supreme Flaming Oak Staff of Grace
+- name: Gem of Cittorak
+  type_name: Jewel
+  enchantment: null
+  enchanted_name: null

@@ -5,9 +5,13 @@
 #include "ast.h"
 
 extern int yylex();
+extern int current_line;
+extern int current_column;
 void yyerror(const char *s);
 
 ASTNode* root;
+
+#define MKNODE(t, v, l, r) create_node_loc(t, v, l, r, current_line, current_column)
 %}
 
 %union {
@@ -16,213 +20,65 @@ ASTNode* root;
 }
 
 %token <str> IDENTIFIER NUMBER STRING
-%token INCANT IMBUE INTO GIVEN YIELD INVOKE 
-%token IMPORT EXPORT FROM LET WITH GESTURE
-%token ARROW DOT COLON SEMICOLON COMMA EQUALS PLUS MINUS STAR SLASH
-%token NEWLINE INDENT DEDENT LPAREN RPAREN END_OF_FILE
+%token MANIFESTS INCANT IF ELSE AS
+%token PIPE DOT COLON SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
+%token PLUS MINUS STAR SLASH PERCENT
+%token NEWLINE INDENT DEDENT
 
-%type <node> program declaration_list declaration import_decl export_decl
-%type <node> incant_decl opt_params imbue_decl imbue_content 
-%type <node> statement_block statement_list statement expression
-%type <node> binary_expr term factor
-%type <node> primary_expr call_args call_arg_list call_arg opt_call_args
-%type <node> param_list param identifier_list simulation_block gesture_stmt invoke_stat
 
-%left PLUS MINUS
-%left STAR SLASH
-%right ARROW
-%left DOT LPAREN
+%type <node> manifest_decl module_ref manifest_symbol_list
+%type <node> incant_decl param_list_opt param_list param
+
+%type <node> block_like pipeline_seq pipeline_item
+%type <node> expression pipe_expr ternary_expr postfix_expr atom_expr
+%type <node> object_literal field_list_opt field_list field_item field
+%type <node> stmt_end_opt
+
+%type <node> paren_group prefix_call callable_expr lambda_literal lambda_body pipe_op
+%type <node> list_literal list_items_opt list_items list_item
+%type <node> arg_list_opt arg_list
 
 %%
 
 program:
-    declaration_list END_OF_FILE { root = $1; }
+    /* empty */
+    | program manifest_decl { if ($2) { if (root) add_next(root, $2); else root = $2; } }
+    | program incant_decl   { if ($2) { if (root) add_next(root, $2); else root = $2; } }
+    | program expression    { if ($2) { if (root) add_next(root, $2); else root = $2; } }
+    | program NEWLINE
+    | program SEMICOLON
     ;
 
-declaration_list:
-    declaration { $$ = $1; }
-    | declaration_list declaration {
-        if ($2) {
-            if ($1) add_next($1, $2);
-            else $1 = $2;
-        }
+manifest_decl:
+    module_ref MANIFESTS LBRACKET manifest_symbol_list RBRACKET stmt_end_opt {
+        $$ = MKNODE(NODE_MANIFEST_DECL, NULL, $1, $4);
+    }
+    ;
+
+module_ref:
+    IDENTIFIER { $$ = MKNODE(NODE_MODULE_REF, $1, NULL, NULL); }
+    | IDENTIFIER LPAREN STRING RPAREN { 
+        $$ = MKNODE(NODE_MODULE_REF, $1, MKNODE(NODE_LITERAL, $3, NULL, NULL), NULL); 
+    }
+    ;
+
+manifest_symbol_list:
+    IDENTIFIER { $$ = MKNODE(NODE_IDENTIFIER, $1, NULL, NULL); }
+    | manifest_symbol_list COMMA IDENTIFIER {
+        add_next($1, MKNODE(NODE_IDENTIFIER, $3, NULL, NULL));
         $$ = $1;
     }
-    | declaration_list NEWLINE { $$ = $1; }
     ;
-
-declaration:
-    import_decl { $$ = $1; }
-    | export_decl { $$ = $1; }
-    | incant_decl { $$ = $1; }
-    | imbue_decl { $$ = $1; }
-    | invoke_stat { $$ = $1; }
-    | simulation_block { $$ = $1; }
-    | LET IDENTIFIER EQUALS expression { $$ = create_node(NODE_LET, $2, $4, NULL); }
-    | SEMICOLON { $$ = NULL; }
-    | NEWLINE { $$ = NULL; }
-    ;
-
-import_decl:
-    IMPORT identifier_list FROM IDENTIFIER SEMICOLON {
-        $$ = create_node(NODE_IMPORT, $4, $2, NULL);
-    }
-    ;
-
-export_decl:
-    EXPORT declaration {
-        $$ = create_node(NODE_EXPORT, NULL, $2, NULL);
-    }
-    ;
-
-    ;
-
-
-
 
 incant_decl:
-    INCANT IDENTIFIER opt_params COLON statement_block {
-        $$ = create_node(NODE_INCANTATION, $2, $3, $5);
+    INCANT IDENTIFIER LBRACKET param_list_opt RBRACKET block_like {
+        $$ = MKNODE(NODE_INCANT_DECL, $2, $4, $6);
     }
     ;
 
-opt_params:
-    LPAREN param_list RPAREN { $$ = $2; }
-    | LPAREN RPAREN { $$ = NULL; }
-    | /* empty */ { $$ = NULL; }
-    ;
-
-    ;
-
-imbue_decl:
-    IMBUE INTO IDENTIFIER COLON imbue_content {
-        $$ = create_node(NODE_IMBUE, $3, NULL, $5);
-    }
-    ;
-
-imbue_content:
-    INDENT statement_list DEDENT { $$ = $2; }
-    | NEWLINE INDENT statement_list DEDENT { $$ = $3; }
-    ;
-
-statement_block:
-    INDENT statement_list DEDENT { $$ = $2; }
-    | NEWLINE INDENT statement_list DEDENT { $$ = $3; }
-    | statement_list { $$ = $1; }
-    ;
-
-statement_list:
-    statement { $$ = $1; }
-    | statement_list statement {
-        if ($2) {
-            if ($1) add_next($1, $2);
-            else $1 = $2;
-        }
-        $$ = $1;
-    }
-    ;
-
-statement:
-    LET IDENTIFIER EQUALS expression { $$ = create_node(NODE_LET, $2, $4, NULL); }
-    | expression { $$ = $1; }
-    | YIELD expression { $$ = create_node(NODE_YIELD, NULL, $2, NULL); }
-    | gesture_stmt { $$ = $1; }
-    | NEWLINE { $$ = NULL; }
-    | SEMICOLON { $$ = NULL; }
-    ;
-
-expression:
-    binary_expr { $$ = $1; }
-    | expression ARROW binary_expr { $$ = create_node(NODE_FLOW, NULL, $1, $3); }
-    ;
-
-binary_expr:
-    term { $$ = $1; }
-    | binary_expr PLUS term { $$ = create_node(NODE_BINOP, "+", $1, $3); }
-    | binary_expr MINUS term { $$ = create_node(NODE_BINOP, "-", $1, $3); }
-    ;
-
-term:
-    factor { $$ = $1; }
-    | term STAR factor { $$ = create_node(NODE_BINOP, "*", $1, $3); }
-    | term SLASH factor { $$ = create_node(NODE_BINOP, "/", $1, $3); }
-    ;
-
-factor:
-    primary_expr { $$ = $1; }
-    | LPAREN expression RPAREN { $$ = $2; }
-    ;
-
-primary_expr:
-    IDENTIFIER { $$ = create_node(NODE_IDENTIFIER, $1, NULL, NULL); }
-    | NUMBER { $$ = create_node(NODE_LITERAL, $1, NULL, NULL); }
-    | STRING { $$ = create_node(NODE_LITERAL, $1, NULL, NULL); }
-    | primary_expr DOT IDENTIFIER { 
-        $$ = create_node(NODE_MEMBER_ACCESS, $3, $1, NULL); 
-    }
-    | primary_expr DOT GESTURE { 
-        $$ = create_node(NODE_MEMBER_ACCESS, "gesture", $1, NULL); 
-    }
-    | primary_expr call_args { 
-        $$ = create_node(NODE_CALL, NULL, $1, $2); 
-    }
-    ;
-
-opt_call_args:
-    LPAREN call_arg_list RPAREN { $$ = $2; }
-    | /* empty */ { $$ = NULL; }
-    ;
-
-call_args:
-    LPAREN call_arg_list RPAREN { $$ = $2; }
-    ;
-
-call_arg_list:
-    call_arg { $$ = $1; }
-    | call_arg_list COMMA call_arg {
-        add_next($1, $3);
-        $$ = $1;
-    }
-    | call_arg_list PLUS call_arg {
-        $$ = create_node(NODE_BINOP, "+", $1, $3);
-    }
-    | /* empty */ { $$ = NULL; }
-    ;
-
-call_arg:
-    IDENTIFIER EQUALS expression { $$ = create_node(NODE_NAMED_ARG, $1, $3, NULL); }
-    | expression { $$ = $1; }
-    ;
-
-simulation_block:
-    GIVEN expression COLON statement_block {
-        $$ = create_node(NODE_GIVEN_BLOCK, NULL, $2, $4);
-    }
-    ;
-
-gesture_stmt:
-    GESTURE opt_call_args WITH IDENTIFIER opt_call_args SEMICOLON {
-        ASTNode* args = $2;
-        if ($5) {
-            if (args) add_next(args, $5);
-            else args = $5;
-        }
-        $$ = create_node(NODE_GESTURE_STMT, $4, args, NULL);
-    }
-    | GESTURE opt_call_args WITH IDENTIFIER opt_call_args {
-        ASTNode* args = $2;
-        if ($5) {
-            if (args) add_next(args, $5);
-            else args = $5;
-        }
-        $$ = create_node(NODE_GESTURE_STMT, $4, args, NULL);
-    }
-    ;
-
-invoke_stat:
-    INVOKE IDENTIFIER SEMICOLON {
-        $$ = create_node(NODE_INVOKE, $2, NULL, NULL);
-    }
+param_list_opt:
+    /* empty */ { $$ = NULL; }
+    | param_list { $$ = $1; }
     ;
 
 param_list:
@@ -235,20 +91,198 @@ param_list:
 
 param:
     IDENTIFIER COLON IDENTIFIER {
-        $$ = create_node(NODE_PARAM, $1, create_node(NODE_IDENTIFIER, $3, NULL, NULL), NULL);
+        $$ = MKNODE(NODE_PARAM, $1, MKNODE(NODE_IDENTIFIER, $3, NULL, NULL), NULL);
     }
     ;
 
-identifier_list:
-    IDENTIFIER { $$ = create_node(NODE_IDENTIFIER, $1, NULL, NULL); }
-    | identifier_list COMMA IDENTIFIER {
-        add_next($1, create_node(NODE_IDENTIFIER, $3, NULL, NULL));
+
+
+block_like:
+    expression { $$ = $1; }
+    | INDENT expression DEDENT { $$ = $2; }
+    | INDENT pipeline_seq DEDENT { $$ = MKNODE(NODE_BLOCK, NULL, $2, NULL); }
+    ;
+
+pipeline_seq:
+    pipeline_item { $$ = $1; }
+    | pipeline_seq pipeline_sep pipeline_item {
+        if ($3) {
+            if ($1) {
+                // If it was a pipe or we want to force pipeline behavior
+                $$ = MKNODE(NODE_PIPELINE, NULL, $1, $3);
+            } else $$ = $3;
+        }
         $$ = $1;
     }
     ;
 
+pipeline_sep:
+    NEWLINE
+    | PIPE
+    | NEWLINE PIPE
+    ;
+
+pipeline_item:
+    expression { $$ = $1; }
+    ;
+
+expression:
+    pipe_expr { $$ = $1; }
+    ;
+
+pipe_expr:
+    ternary_expr { $$ = $1; }
+    | pipe_expr pipe_op ternary_expr {
+        $$ = MKNODE(NODE_PIPELINE, NULL, $1, $3);
+    }
+    ;
+
+pipe_op:
+    PIPE { $$ = NULL; }
+    | NEWLINE PIPE { $$ = NULL; }
+    | PIPE NEWLINE { $$ = NULL; }
+    | NEWLINE PIPE NEWLINE { $$ = NULL; }
+    ;
+
+ternary_expr:
+    postfix_expr { $$ = $1; }
+    | postfix_expr IF expression ELSE expression {
+        ASTNode* cond_block = $3;
+        add_next(cond_block, $5);
+        $$ = MKNODE(NODE_TERNARY, NULL, $1, cond_block);
+    }
+    ;
+
+postfix_expr:
+    atom_expr { $$ = $1; }
+    | postfix_expr DOT IDENTIFIER { $$ = MKNODE(NODE_MEMBER_ACCESS, $3, $1, NULL); }
+    | postfix_expr object_literal { $$ = MKNODE(NODE_RECORD_CALL, NULL, $1, $2); }
+    ;
+
+arg_list_opt:
+    /* empty */ { $$ = NULL; }
+    | arg_list { $$ = $1; }
+    ;
+
+arg_list:
+    expression { $$ = $1; }
+    | arg_list expression { add_next($1, $2); $$ = $1; }
+    | arg_list COMMA expression { add_next($1, $3); $$ = $1; }
+    ;
+
+atom_expr:
+    IDENTIFIER { $$ = MKNODE(NODE_IDENTIFIER, $1, NULL, NULL); }
+    | NUMBER { $$ = MKNODE(NODE_LITERAL, $1, NULL, NULL); }
+    | STRING { $$ = MKNODE(NODE_LITERAL, $1, NULL, NULL); }
+    | COLON IDENTIFIER { $$ = MKNODE(NODE_IDENTIFIER, $2, NULL, NULL); }
+    | paren_group { $$ = $1; }
+    | prefix_call { $$ = $1; }
+    | lambda_literal { $$ = $1; }
+    | list_literal { $$ = $1; }
+    | object_literal { $$ = $1; }
+    ;
+
+paren_group:
+    LPAREN expression RPAREN { $$ = $2; }
+    ;
+
+prefix_call:
+    LPAREN callable_expr arg_list_opt RPAREN {
+        $$ = MKNODE(NODE_PREFIX_CALL, NULL, $2, $3);
+    }
+    ;
+
+callable_expr:
+    postfix_expr { $$ = $1; }
+    | PLUS { $$ = MKNODE(NODE_IDENTIFIER, "+", NULL, NULL); }
+    | MINUS { $$ = MKNODE(NODE_IDENTIFIER, "-", NULL, NULL); }
+    | STAR { $$ = MKNODE(NODE_IDENTIFIER, "*", NULL, NULL); }
+    | SLASH { $$ = MKNODE(NODE_IDENTIFIER, "/", NULL, NULL); }
+    | PERCENT { $$ = MKNODE(NODE_IDENTIFIER, "%", NULL, NULL); }
+    ;
+
+lambda_literal:
+    LPAREN LBRACKET lambda_body RBRACKET RPAREN { $$ = $3; }
+    | LBRACKET LBRACKET lambda_body RBRACKET RBRACKET { $$ = $3; }
+    ;
+
+lambda_body:
+    param_list COMMA expression { $$ = MKNODE(NODE_LAMBDA, NULL, $1, $3); }
+    | LBRACKET param_list RBRACKET COMMA expression { $$ = MKNODE(NODE_LAMBDA, NULL, $2, $5); }
+    ;
+
+list_literal:
+    LBRACKET list_sep_opt list_items_opt list_sep_opt RBRACKET { $$ = MKNODE(NODE_LIST_LITERAL, NULL, $3, NULL); }
+    ;
+
+list_sep_opt:
+    /* empty */
+    | COMMA
+    | NEWLINE
+    | COMMA NEWLINE
+    ;
+
+list_items_opt:
+    /* empty */ { $$ = NULL; }
+    | list_items { $$ = $1; }
+    ;
+
+list_items:
+    list_item { $$ = $1; }
+    | list_items COMMA list_item { add_next($1, $3); $$ = $1; }
+    | list_items list_item { add_next($1, $2); $$ = $1; }
+    ;
+
+list_item:
+    IDENTIFIER AS expression { 
+        $$ = MKNODE(NODE_LIST_ITEM_ALIAS, $1, $3, NULL); 
+    }
+    | expression { $$ = $1; }
+    ;
+
+object_literal:
+    LBRACE field_list_opt RBRACE { $$ = MKNODE(NODE_OBJECT_LITERAL, NULL, $2, NULL); }
+    ;
+
+field_list_opt:
+    /* empty */ { $$ = NULL; }
+    | field_list { $$ = $1; }
+    ;
+
+field_list:
+    field_item { $$ = $1; }
+    | field_list field_item {
+        if ($2) {
+            if ($1) { add_next($1, $2); $$ = $1; }
+            else $$ = $2;
+        } else {
+            $$ = $1;
+        }
+    }
+    ;
+
+field_item:
+    field { $$ = $1; }
+    | SEMICOLON { $$ = NULL; }
+    | COMMA { $$ = NULL; }
+    | NEWLINE { $$ = NULL; }
+    ;
+
+field:
+    IDENTIFIER COLON expression { $$ = MKNODE(NODE_FIELD, $1, $3, NULL); }
+    | IDENTIFIER { $$ = MKNODE(NODE_FIELD, $1, NULL, NULL); }
+    ;
+
+stmt_end_opt:
+    /* empty */ { $$ = NULL; }
+    | SEMICOLON { $$ = NULL; }
+    | NEWLINE { $$ = NULL; }
+    ;
+
 %%
 
+extern char* yytext;
+
 void yyerror(const char *s) {
-    fprintf(stderr, "Error: %s\n", s);
+    fprintf(stderr, "Error at line %d, column %d: %s (near '%s')\n", current_line, current_column, s, yytext);
 }

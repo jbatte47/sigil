@@ -1,0 +1,8 @@
+core manifests [ Type, Distance, Func ]
+reality manifests [ Enemy ]
+paranormal manifests [ Psychic ]
+
+incant target_nearest_enemy [type:Type, radius:Distance]
+  (Psychic.ping (actual radius))
+  | (Func.filter (join type Enemy))
+  | (Func.first)

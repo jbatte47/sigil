@@ -6,6 +6,9 @@ int indent_stack[100] = {0};
 int indent_top = 0;
 int dedents_to_emit = 0;
 
+int current_line = 1;
+int current_column = 1;
+
 void push_indent(int indent) {
     indent_stack[++indent_top] = indent;
 }
@@ -17,6 +20,21 @@ int pop_indent() {
 int top_indent() {
     return indent_stack[indent_top];
 }
+
+int paren_level = 0;
+
+void update_pos() {
+    for (int i = 0; yytext[i] != '\0'; i++) {
+        if (yytext[i] == '\n') {
+            current_line++;
+            current_column = 1;
+        } else {
+            current_column++;
+        }
+    }
+}
+
+#define YY_USER_ACTION update_pos();
 %}
 
 %option noyywrap
@@ -27,6 +45,7 @@ int top_indent() {
 ^[ \t]*\n          ; // skip empty lines with spaces
 \n[ \t]* {
     int indent = strlen(yytext) - 1;
+    if (paren_level > 0) return NEWLINE; // Ignore indent changes inside groups
     if (indent > top_indent()) {
         push_indent(indent);
         return INDENT;
@@ -50,36 +69,32 @@ int top_indent() {
         pop_indent();
         return DEDENT;
     }
-    static int once = 0;
-    if (once) yyterminate();
-    once = 1;
-    return END_OF_FILE;
+    return 0;
 }
 
+"manifests"         { return MANIFESTS; }
 "incant"            { return INCANT; }
-"imbue"             { return IMBUE; }
-"into"              { return INTO; }
-"given"             { return GIVEN; }
-"yield"             { return YIELD; }
-"invoke"            { return INVOKE; }
-"import"            { return IMPORT; }
-"export"            { return EXPORT; }
-"from"              { return FROM; }
-"let"               { return LET; }
-"with"              { return WITH; }
-"gesture"           { return GESTURE; }
-"->"                { return ARROW; }
+"if"                { return IF; }
+"else"              { return ELSE; }
+"as"                { return AS; }
+
+"|"                 { return PIPE; }
 "."                 { return DOT; }
 ":"                 { return COLON; }
 ";"                 { return SEMICOLON; }
 ","                 { return COMMA; }
-"("                 { return LPAREN; }
-")"                 { return RPAREN; }
-"="                 { return EQUALS; }
+"("                 { paren_level++; return LPAREN; }
+")"                 { paren_level--; return RPAREN; }
+"["                 { paren_level++; return LBRACKET; }
+"]"                 { paren_level--; return RBRACKET; }
+"{"                 { paren_level++; return LBRACE; }
+"}"                 { paren_level--; return RBRACE; }
+
 "+"                 { return PLUS; }
 "-"                 { return MINUS; }
 "*"                 { return STAR; }
 "/"                 { return SLASH; }
+"%"                 { return PERCENT; }
 
 [0-9]+(\.[0-9]+)?   { 
     yylval.str = strdup(yytext); 

@@ -26,3 +26,8 @@ compiler/*.dSYM/
 *.swp
 *.swo
 *~
+
+
+# Added by cargo
+
+/target

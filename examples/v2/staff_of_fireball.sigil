@@ -1,0 +1,19 @@
+body manifests [ RightHand, Thumb ]
+core manifests [ Number ]
+paranormal manifests [ Gesture, Rune, FireSigil ]
+vessel manifests [ Staff, Wand ]
+reality manifests [ Combustible ]
+local('fireball') manifests [ fireball ]
+local('target_nearest_enemy') manifests [ target_nearest_enemy ]
+
+incant favor_staff [rune:Rune]
+  { actualize_number: ([num:Number, (/ num (2 if (eq (get adorns rune) Wand) else 1))]) }
+
+:Rune {
+  symbol: FireSigil;
+  can_adorn: [Staff, Wand];
+  caveats: [favor_staff];
+  trigger: (Gesture.long_press (join RightHand Thumb)) | Gesture.sweep;
+  spell: (hold [target as (target_nearest_enemy { type:Combustible; radius:10 })])
+    | (fireball { target; intensity:400 });
+}

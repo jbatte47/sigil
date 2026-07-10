@@ -1,6 +1,4 @@
 #include "ast.h"
-#include "runtime.h"
-#include "semantic.h"
 #include "sigil.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,14 +17,11 @@ int main(int argc, char **argv) {
     yyin = file;
   }
 
+  printf("[SIGIL COMPILER] v2.0-alpha Parsing...\n");
+
   if (yyparse() == 0) {
-    if (validate_ritual(root)) {
-      execute_ritual(root);
-    } else {
-      printf("\n[SIGIL COMPILER] Ritual failed semantic validation. Reality "
-             "instability detected.\n");
-      return 1;
-    }
+    printf("[SIGIL COMPILER] Parse successful. AST Output:\n");
+    print_ast(root, 0);
   } else {
     printf(
         "\n[SIGIL COMPILER] Ritual failed due to grammatical instability.\n");

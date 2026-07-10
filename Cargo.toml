@@ -1,0 +1,13 @@
+[package]
+name = "sigil"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5.60", features = ["derive"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_yaml = "0.9.34"
+
+[build-dependencies]
+cc = "1.2.56"
+bindgen = "0.72.1"

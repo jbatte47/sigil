@@ -3,7 +3,7 @@ LEX = flex
 YACC = bison
 CFLAGS = -Wall -g
 
-SRCS = sigil.tab.c lex.yy.c ast.c nodes.c semantic.c runtime.c compiler.c
+SRCS = sigil.tab.c lex.yy.c ast.c compiler.c
 OBJS = $(SRCS:.c=.o)
 TARGET = sigil_compiler
 
@@ -13,14 +13,14 @@ $(TARGET): sigil.tab.c lex.yy.c $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS)
 
 sigil.tab.c sigil.tab.h: sigil.y
-	$(YACC) -d sigil.y
+	$(YACC) -v -d sigil.y
 
 lex.yy.c: sigil.l sigil.tab.h
 	$(LEX) sigil.l
 
-# Run the gold standard example
+# Run a v2 example
 run: $(TARGET)
-	./$(TARGET) ../examples/fireball_staff.sigil
+	./$(TARGET) ../examples/v2/fireball.sigil
 
 clean:
-	rm -f $(TARGET) *.o sigil.tab.c sigil.tab.h lex.yy.c
+	rm -f $(TARGET) *.o sigil.tab.c sigil.tab.h lex.yy.c sigil.output

@@ -1,99 +1,128 @@
-<program>           ::= <declaration_list>
+<program> ::= <top_list>
 
-<declaration_list>    ::= <declaration>
-                     | <declaration_list> <declaration>
+<top_list> ::= <top_decl>
+             | <top_list> <top_decl>
 
-<declaration>         ::= <import_decl>
-                     | <export_decl>
-                     | <incant_decl>
-                     | <imbue_decl>
-                     | <invoke_stat>
-                     | <simulation_block>
+<top_decl> ::= <manifest_decl>
+             | <incant_decl>
+             | <attribute_apply_decl>
+             | NEWLINE
+
+<manifest_decl> ::= <module_ref> "manifests" "[" <manifest_symbol_list> "]" <stmt_end_opt>
+
+<module_ref> ::= IDENTIFIER
+               | IDENTIFIER "(" STRING ")"
+
+<manifest_symbol_list> ::= IDENTIFIER
+                         | <manifest_symbol_list> "," IDENTIFIER
+
+<incant_decl> ::= "incant" IDENTIFIER "[" <param_list_opt> "]" <block_like>
+
+<param_list_opt> ::= /* empty */
+                   | <param_list>
+
+<param_list> ::= <param>
+               | <param_list> "," <param>
+
+<param> ::= IDENTIFIER ":" IDENTIFIER
+
+<attribute_apply_decl> ::= ":" IDENTIFIER <object_literal>
+
+<block_like> ::= <expression>
+               | <object_literal>
+               | NEWLINE INDENT <pipeline_seq> DEDENT
+
+<pipeline_seq> ::= <pipeline_item>
+                 | <pipeline_seq> NEWLINE <pipeline_item>
+
+<pipeline_item> ::= <expression>
+
+<expression> ::= <pipe_expr>
+
+<pipe_expr> ::= <ternary_expr>
+              | <pipe_expr> "|" <ternary_expr>
+
+<ternary_expr> ::= <postfix_expr>
+                 | <postfix_expr> "if" <expression> "else" <expression>
+
+<postfix_expr> ::= <atom_expr>
+                 | <postfix_expr> "." IDENTIFIER
+                 | <postfix_expr> <record_call>
+
+<record_call> ::= "{" <arg_field_list_opt> "}"
+
+<arg_list_opt> ::= /* empty */
+                 | <arg_list>
+
+<arg_list> ::= <expression>
+             | <arg_list> <expression>
+             | <arg_list> "," <expression>
+
+<arg_field_list_opt> ::= /* empty */
+                       | <arg_field_list>
+
+<arg_field_list> ::= <arg_field>
+                   | <arg_field_list> <arg_field_sep> <arg_field>
+
+<arg_field_sep> ::= ";"
+                  | ","
+                  | NEWLINE
+
+<arg_field> ::= IDENTIFIER ":" <expression>
+              | IDENTIFIER
+
+<atom_expr> ::= IDENTIFIER
+              | NUMBER
+              | STRING
+              | ":" IDENTIFIER
+              | <prefix_call>
+              | <lambda_literal>
+              | <list_literal>
+              | <object_literal>
+
+<prefix_call> ::= "(" <callable_expr> <arg_list_opt> ")"
+
+<callable_expr> ::= <callable_path>
+                  | "+"
+                  | "-"
+                  | "*"
+                  | "/"
+                  | "%"
+
+<callable_path> ::= IDENTIFIER
+                  | <callable_path> "." IDENTIFIER
+
+<lambda_literal> ::= "(" "[" <param_list_opt> "]" "," <expression> ")"
+                   | "[" "[" <param_list_opt> "]" "," <expression> "]"
+
+<list_literal> ::= "[" <list_items_opt> "]"
+
+<list_items_opt> ::= /* empty */
+                   | <list_items>
+
+<list_items> ::= <list_item>
+               | <list_items> "," <list_item>
+               | <list_items> <list_item>
+
+<list_item> ::= <expression>
+              | IDENTIFIER "as" <expression>
+              | <param>
+
+<object_literal> ::= "{" <object_field_list_opt> "}"
+
+<object_field_list_opt> ::= /* empty */
+                          | <object_field_list>
+
+<object_field_list> ::= <object_field>
+                      | <object_field_list> <object_field_sep> <object_field>
+
+<object_field_sep> ::= ";"
+                     | ","
                      | NEWLINE
 
-<import_decl>       ::= "import" <identifier_list> "from" <identifier> ";"
+<object_field> ::= IDENTIFIER ":" <expression>
+                 | IDENTIFIER
 
-<export_decl>       ::= "export" <declaration>
-
-
-
-
-
-<incant_decl>       ::= "incant" <identifier> <opt_params> ":" <statement_block>
-
-<opt_params>        ::= "(" <param_list> ")"
-                     | "(" ")"
-                     | /* empty */
-
-
-<imbue_decl>         ::= "imbue" "into" <identifier> ":" <imbue_content>
-
-<imbue_content>      ::= INDENT <statement_list> DEDENT
-                     | NEWLINE INDENT <statement_list> DEDENT
-
-<statement_block>   ::= INDENT <statement_list> DEDENT
-                     | NEWLINE INDENT <statement_list> DEDENT
-                     | <statement_list>
-
-<statement_list>    ::= <statement>
-                     | <statement_list> <statement>
-
-<statement>         ::= "let" <identifier> "=" <expression>
-                     | <expression>
-                     | "yield" <expression>
-                     | <gesture_stmt>
-                     | NEWLINE
-                     | ";"
-
-<expression>        ::= <binary_expr>
-                     | <expression> "->" <binary_expr>
-
-<binary_expr>       ::= <term>
-                     | <binary_expr> "+" <term>
-                     | <binary_expr> "-" <term>
-
-<term>              ::= <factor>
-                     | <term> "*" <factor>
-                     | <term> "/" <factor>
-
-<factor>            ::= <primary_expr>
-                     | "(" <expression> ")"
-
-<primary_expr>      ::= <identifier>
-                     | NUMBER
-                     | STRING
-                     | <primary_expr> "." <identifier>
-                     | <primary_expr> "." "gesture"
-                     | <primary_expr> <call_args>
-
-<call_args>         ::= "(" <call_arg_list> ")"
-
-<opt_call_args>     ::= <call_args>
-                     | /* empty */
-
-<call_arg_list>     ::= <call_arg>
-                     | <call_arg_list> "," <call_arg>
-                     | <call_arg_list> "+" <call_arg>
-                     | /* empty */
-
-<call_arg>          ::= <identifier> "=" <expression>
-                     | <expression>
-
-
-<simulation_block>  ::= "given" <expression> ":" <statement_block>
-
-<gesture_stmt>      ::= "gesture" <opt_call_args> "with" <identifier> <opt_call_args> ";"
-                     | "gesture" <opt_call_args> "with" <identifier> <opt_call_args>
-
-<invoke_stat>        ::= "invoke" <identifier> ";"
-
-<param_list>        ::= <param>
-                     | <param_list> "," <param>
-
-<param>             ::= <identifier> ":" <identifier>
-
-<identifier_list>    ::= <identifier>
-                     | <identifier_list> "," <identifier>
-
-<type>              ::= <identifier>
-<identifier>        ::= IDENTIFIER
+<stmt_end_opt> ::= /* empty */
+                 | ";"
+                 | NEWLINE
