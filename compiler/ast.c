@@ -39,6 +39,10 @@ const char *type_to_string(NodeType type) {
     return "MANIFEST_DECL";
   case NODE_INCANT_DECL:
     return "INCANT_DECL";
+  case NODE_TYPE_DECL:
+    return "TYPE_DECL";
+  case NODE_INSTANCE_DECL:
+    return "INSTANCE_DECL";
   case NODE_ATTRIBUTE_APPLY:
     return "ATTRIBUTE_APPLY";
   case NODE_MODULE_REF:

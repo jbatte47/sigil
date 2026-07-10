@@ -20,19 +20,24 @@ ASTNode* root;
 }
 
 %token <str> IDENTIFIER NUMBER STRING
-%token MANIFESTS INCANT IF ELSE AS
+%token MANIFESTS INCANT
+%token <str> TYPE INSTANCE
+%token IF ELSE AS
 %token PIPE DOT COLON SEMICOLON COMMA LPAREN RPAREN LBRACKET RBRACKET LBRACE RBRACE
 %token PLUS MINUS STAR SLASH PERCENT
+%token CARET CARET_TILDE
 %token NEWLINE INDENT DEDENT
 
 
 %type <node> manifest_decl module_ref manifest_symbol_list
 %type <node> incant_decl param_list_opt param_list param
+%type <node> type_decl instance_decl metadata_prefix
 
 %type <node> block_like pipeline_seq pipeline_item
 %type <node> expression pipe_expr ternary_expr postfix_expr atom_expr
 %type <node> object_literal field_list_opt field_list field_item field
 %type <node> stmt_end_opt
+%type <str> name_token
 
 %type <node> paren_group prefix_call callable_expr lambda_literal lambda_body pipe_op
 %type <node> list_literal list_items_opt list_items list_item
@@ -44,6 +49,8 @@ program:
     /* empty */
     | program manifest_decl { if ($2) { if (root) add_next(root, $2); else root = $2; } }
     | program incant_decl   { if ($2) { if (root) add_next(root, $2); else root = $2; } }
+    | program type_decl     { if ($2) { if (root) add_next(root, $2); else root = $2; } }
+    | program instance_decl { if ($2) { if (root) add_next(root, $2); else root = $2; } }
     | program expression    { if ($2) { if (root) add_next(root, $2); else root = $2; } }
     | program NEWLINE
     | program SEMICOLON
@@ -56,15 +63,15 @@ manifest_decl:
     ;
 
 module_ref:
-    IDENTIFIER { $$ = MKNODE(NODE_MODULE_REF, $1, NULL, NULL); }
-    | IDENTIFIER LPAREN STRING RPAREN { 
+    name_token { $$ = MKNODE(NODE_MODULE_REF, $1, NULL, NULL); }
+    | name_token LPAREN STRING RPAREN {
         $$ = MKNODE(NODE_MODULE_REF, $1, MKNODE(NODE_LITERAL, $3, NULL, NULL), NULL); 
     }
     ;
 
 manifest_symbol_list:
-    IDENTIFIER { $$ = MKNODE(NODE_IDENTIFIER, $1, NULL, NULL); }
-    | manifest_symbol_list COMMA IDENTIFIER {
+    name_token { $$ = MKNODE(NODE_IDENTIFIER, $1, NULL, NULL); }
+    | manifest_symbol_list COMMA name_token {
         add_next($1, MKNODE(NODE_IDENTIFIER, $3, NULL, NULL));
         $$ = $1;
     }
@@ -73,6 +80,36 @@ manifest_symbol_list:
 incant_decl:
     INCANT IDENTIFIER LBRACKET param_list_opt RBRACKET block_like {
         $$ = MKNODE(NODE_INCANT_DECL, $2, $4, $6);
+    }
+    ;
+
+type_decl:
+    TYPE name_token stmt_end_opt {
+        $$ = MKNODE(NODE_TYPE_DECL, $2, NULL, NULL);
+    }
+    | TYPE name_token metadata_prefix stmt_end_opt {
+        $$ = MKNODE(NODE_TYPE_DECL, $2, $3, NULL);
+    }
+    ;
+
+instance_decl:
+    INSTANCE name_token COLON name_token stmt_end_opt {
+        $$ = MKNODE(NODE_INSTANCE_DECL, $2, MKNODE(NODE_IDENTIFIER, $4, NULL, NULL), NULL);
+    }
+    | INSTANCE metadata_prefix name_token COLON name_token stmt_end_opt {
+        $$ = MKNODE(NODE_INSTANCE_DECL, $3, MKNODE(NODE_IDENTIFIER, $5, NULL, NULL), $2);
+    }
+    ;
+
+metadata_prefix:
+    CARET object_literal {
+        $$ = $2;
+    }
+    | CARET_TILDE object_literal {
+        $$ = $2;
+        if ($$) {
+            $$->value = strdup("override");
+        }
     }
     ;
 
@@ -90,7 +127,7 @@ param_list:
     ;
 
 param:
-    IDENTIFIER COLON IDENTIFIER {
+    name_token COLON name_token {
         $$ = MKNODE(NODE_PARAM, $1, MKNODE(NODE_IDENTIFIER, $3, NULL, NULL), NULL);
     }
     ;
@@ -155,7 +192,7 @@ ternary_expr:
 
 postfix_expr:
     atom_expr { $$ = $1; }
-    | postfix_expr DOT IDENTIFIER { $$ = MKNODE(NODE_MEMBER_ACCESS, $3, $1, NULL); }
+    | postfix_expr DOT name_token { $$ = MKNODE(NODE_MEMBER_ACCESS, $3, $1, NULL); }
     | postfix_expr object_literal { $$ = MKNODE(NODE_RECORD_CALL, NULL, $1, $2); }
     ;
 
@@ -171,10 +208,10 @@ arg_list:
     ;
 
 atom_expr:
-    IDENTIFIER { $$ = MKNODE(NODE_IDENTIFIER, $1, NULL, NULL); }
+    name_token { $$ = MKNODE(NODE_IDENTIFIER, $1, NULL, NULL); }
     | NUMBER { $$ = MKNODE(NODE_LITERAL, $1, NULL, NULL); }
     | STRING { $$ = MKNODE(NODE_LITERAL, $1, NULL, NULL); }
-    | COLON IDENTIFIER { $$ = MKNODE(NODE_IDENTIFIER, $2, NULL, NULL); }
+    | COLON name_token { $$ = MKNODE(NODE_IDENTIFIER, $2, NULL, NULL); }
     | paren_group { $$ = $1; }
     | prefix_call { $$ = $1; }
     | lambda_literal { $$ = $1; }
@@ -234,7 +271,7 @@ list_items:
     ;
 
 list_item:
-    IDENTIFIER AS expression { 
+    name_token AS expression {
         $$ = MKNODE(NODE_LIST_ITEM_ALIAS, $1, $3, NULL); 
     }
     | expression { $$ = $1; }
@@ -269,8 +306,14 @@ field_item:
     ;
 
 field:
-    IDENTIFIER COLON expression { $$ = MKNODE(NODE_FIELD, $1, $3, NULL); }
-    | IDENTIFIER { $$ = MKNODE(NODE_FIELD, $1, NULL, NULL); }
+    name_token COLON expression { $$ = MKNODE(NODE_FIELD, $1, $3, NULL); }
+    | name_token { $$ = MKNODE(NODE_FIELD, $1, NULL, NULL); }
+    ;
+
+name_token:
+    IDENTIFIER { $$ = $1; }
+    | TYPE { $$ = $1; }
+    | INSTANCE { $$ = $1; }
     ;
 
 stmt_end_opt:

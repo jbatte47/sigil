@@ -74,9 +74,14 @@ void update_pos() {
 
 "manifests"         { return MANIFESTS; }
 "incant"            { return INCANT; }
+"type"              { yylval.str = strdup("type"); return TYPE; }
+"instance"          { yylval.str = strdup("instance"); return INSTANCE; }
 "if"                { return IF; }
 "else"              { return ELSE; }
 "as"                { return AS; }
+
+"^~"                { return CARET_TILDE; }
+"^"                 { return CARET; }
 
 "|"                 { return PIPE; }
 "."                 { return DOT; }

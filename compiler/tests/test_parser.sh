@@ -34,29 +34,29 @@ assert_parse() {
     fi
 }
 
-# 1. Basic Declaration
-assert_parse "basic_decl" "instance fireball_staff:weapon;" 0
+# 1. Manifest declaration
+assert_parse "manifest_decl" "core manifests [Enemy, Creature]" 0
 
-# 2. String Literal
-assert_parse "string_literal" "incant test():\n  let msg = \"Hello Sigil\"" 0
+# 2. v2 incant declaration
+assert_parse "incant_v2" "incant fireball [target:Combustible, intensity:Factor]\n  target" 0
 
-# 3. Decorators
-assert_parse "decorators" "instance staff:weapon.fire(level=10);" 0
+# 3. Type declaration without metadata
+assert_parse "type_decl_plain" "type Enemy" 0
 
-# 4. Named Args (Equals)
-assert_parse "named_args_equals" "incant test():\n  cast(spell=fireball, power=10)" 0
+# 4. Type declaration with metadata
+assert_parse "type_decl_metadata" "type Enemy ^{hp_base: 50, defense: 3}" 0
 
-# 5. Named Args (Colon - EXPECT FAIL)
-assert_parse "named_args_colon" "incant test():\n  cast(spell:fireball)" 1
+# 5. Instance declaration without metadata
+assert_parse "instance_decl_plain" "instance goblin :Enemy" 0
 
-# 6. Gesture Statement (Full)
-assert_parse "gesture_full" "given User.simulate():\n  gesture (target=foe) with staff (power=5);" 0
+# 6. Instance declaration with metadata
+assert_parse "instance_decl_metadata" "instance ^{hp: 75, fierce: true} orc_warlord :Enemy" 0
 
-# 7. Member Access Recursion
-assert_parse "member_access" "incant test():\n  let x = player.stats.health" 0
+# 7. Instance declaration with override metadata
+assert_parse "instance_decl_override" "instance ^~{hp: 999, defense: 10} demigod :Enemy" 0
 
-# 8. Primary Expr Dot Gesture
-assert_parse "dot_gesture" "incant test():\n  let x = staff.gesture" 0
+# 8. Legacy v1 incant syntax should fail
+assert_parse "legacy_incant_parens" "incant fireball(target:Combustible):" 1
 
 echo "-------------------"
 echo "Tests Passed: $passed"

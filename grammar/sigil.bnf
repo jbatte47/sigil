@@ -5,6 +5,8 @@
 
 <top_decl> ::= <manifest_decl>
              | <incant_decl>
+             | <type_decl>
+             | <instance_decl>
              | <attribute_apply_decl>
              | NEWLINE
 
@@ -17,6 +19,13 @@
                          | <manifest_symbol_list> "," IDENTIFIER
 
 <incant_decl> ::= "incant" IDENTIFIER "[" <param_list_opt> "]" <block_like>
+
+<type_decl> ::= "type" IDENTIFIER [<metadata_prefix>] <stmt_end_opt>
+
+<instance_decl> ::= "instance" [<metadata_prefix>] IDENTIFIER ":" IDENTIFIER <stmt_end_opt>
+
+<metadata_prefix> ::= "^" <object_literal>
+                    | "^~" <object_literal>
 
 <param_list_opt> ::= /* empty */
                    | <param_list>

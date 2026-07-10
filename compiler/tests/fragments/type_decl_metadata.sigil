@@ -1,0 +1,1 @@
+type Enemy ^{hp_base: 50, defense: 3}
